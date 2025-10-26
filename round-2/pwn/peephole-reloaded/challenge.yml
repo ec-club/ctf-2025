@@ -1,0 +1,53 @@
+name: Peephole Reloaded
+author: "[flame](https://github.com/zolbooo)"
+category: pwn
+
+description: |
+  Sometimes, you get less and less information from the other side…
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: ncat --ssl peephole-reloaded.ctf.empasoft.tech 1337
+files:
+  - files/challenge
+
+hints:
+  - cost: 100
+    content: |
+      ```go
+      func submitPayload(conn *quic.Conn, payload []byte) {
+        send, err := conn.OpenUniStream()
+        if err != nil {
+          panic(err)
+        }
+
+        buf := make([]byte, 1024)
+        if _, err = send.Write(payload); err != nil {
+          panic(err)
+        }
+
+        read, err := conn.AcceptUniStream(context.Background())
+        if err != nil {
+          panic(err)
+        }
+        n, _ := read.Read(buf)
+        fmt.Println(string(buf[:n]))
+        n, _ = read.Read(buf)
+        fmt.Println(string(buf[:n]))
+      }
+      ```
+
+flags:
+  - type: regex
+    content: ECTF{w000w_[A-Za-z\d\-_]{8,}_s0_sm0l_[A-Za-z\d\-_]{8,}_but_p3eph0l3_r34lly_w0rks!}
+tags:
+  - pwn
+  - networking
+version: "0.1"

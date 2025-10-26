@@ -1,0 +1,28 @@
+services:
+  peephole:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/peephole:latest
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      FLAG: ECTF{w00w_n0_sysc@lls???_%s_spl1c3_%s}
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.tcp.routers.peephole.rule=HostSNI(`peephole.ctf.empasoft.tech`)
+      - traefik.tcp.routers.peephole.entrypoints=tcp
+      - traefik.tcp.routers.peephole.tls=true
+      - traefik.tcp.routers.peephole.tls.certresolver=le
+      - traefik.tcp.services.peephole.loadbalancer.server.port=1337
+networks:
+  default:
+    name: traefik-external
+    external: true

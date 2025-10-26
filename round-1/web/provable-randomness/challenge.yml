@@ -1,0 +1,25 @@
+name: Provable randomness
+author: "[flame](https://github.com/zolbooo)"
+category: web
+
+description: |
+  Have you ever wondered how to generate a random number in a provable way?
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: https://provable-randomness.ctf.empasoft.tech
+
+flags:
+  - type: regex
+    content: ECTF{v3ry_s3cur3_[A-Za-z\d\-_]{8,}_r@nd0mn3ss_[A-Za-z\d\-_]{8,}}
+tags:
+  - web
+  - crypto
+version: "0.1"

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.js"></script>
+		<script>
+			const totalSounds = 2;
+			const sounds = Array.from(
+				{ length: totalSounds },
+				(_, i) =>
+					new Howl({
+						src: [`/assets/${i + 1}.mp3`],
+						volume: 1
+					})
+			);
+			let hasPlayed = false;
+			window.addEventListener('click', () => {
+				if (!hasPlayed) {
+					sounds[Math.floor(Math.random() * totalSounds)].play();
+					hasPlayed = true;
+				}
+			});
+		</script>
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+	<!--
+		built by wujek: /about-me
+		have you seen my young sister? she even got her own Korean name.
+		like https://youtu.be/Vn2eIFQM2EI ??
+	-->
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LISA VIN Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 LISA VIN Manager</h1>
+            <p>Automotive Security Challenge Environment</p>
+        </div>
+        
+        <div class="main-section">
+            <h2>Start Environment</h2>
+            <p style="margin-bottom: 20px; opacity: 0.8;">
+                Start Challenge
+            </p>
+            
+            <button id="startBtn" class="start-button" onclick="startEnvironment()">
+                🚀 Start Service
+            </button>
+            
+            <div id="sessionInfo" class="session-info">
+                <h3>🎯 Session Info</h3>
+                <div class="info-item">
+                    <span class="info-label">Session ID:</span>
+                    <span id="sessionId" class="info-value">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Port:</span>
+                    <span id="infotainmentPort" class="info-value">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Status:</span>
+                    <span id="sessionStatus" class="info-value">
+                        <span class="status-indicator status-running"></span>Running
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Remaining Time:</span>
+                    <span id="remainingTime" class="info-value">-</span>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

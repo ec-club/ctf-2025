@@ -1,0 +1,35 @@
+name: VIN for win
+author: "[Lab of Information Systems Security Assurance, Soonchunhyang University](https://www.schlisa.com)"
+category: hardware
+
+description: |
+  I have a car, but I forgot its VIN. Can you help me retrieve it?
+  Hurry up, I am at the border and they are asking for it!
+
+  Request an instance at: https://vin-for-win.ctf.empasoft.tech
+
+attribution: Authored by [Lab of Information Systems Security Assurance, Soonchunhyang University](https://www.schlisa.com)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+attempts: 5
+
+connection_info: nc vin-for-win.ctf.empasoft.tech <port>
+
+hints:
+  - cost: 50
+    content: |
+      All you need is `can-tools` and find where I connected the OBD-II adapter.
+
+flags:
+  - type: regex
+    content: ECTF{G3T_V1N_BR0}
+tags:
+  - hardware
+  - automotive
+version: "0.1"

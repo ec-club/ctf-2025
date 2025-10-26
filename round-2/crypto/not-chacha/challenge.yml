@@ -1,0 +1,29 @@
+name: Not ChaCha
+author: "[flame](https://github.com/zolbooo)"
+category: crypto
+
+description: |
+  Have you played around with JWTs enough? I don't think so.
+  Here's a token signed (?) with Poly1305. Good luck!
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: https://not-chacha.ctf.empasoft.tech
+
+files:
+  - challenge/app/auth.py
+
+flags:
+  - type: regex
+    content: ECTF{[A-Za-z\d\-_]{8}_c@r3ful_[A-Za-z\d\-_]{8}_M@cS_4r3_d1ff3r3n!_[A-Za-z\d\-_]{8}}
+tags:
+  - crypto
+  - web
+version: "0.1"

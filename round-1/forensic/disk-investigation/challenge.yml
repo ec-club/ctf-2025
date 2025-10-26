@@ -1,0 +1,39 @@
+name: Disk investigation
+author: "[flame](https://github.com/zolbooo)"
+category: forensic
+
+description: |
+  Have you ever wondered what secrets a disk image might hold?
+  Also, have you ever pondered how to extract cryptographic secrets from the server?
+  How does forensic work with crypto? Also, how this challenge can turn out to be about hardware?
+
+  Disk image: https://challenge-assets-production-empasoft-ctf.s3.ap-east-1.amazonaws.com/forensic/disk-investigation/disk.img
+
+  SSH key: https://challenge-assets-production-empasoft-ctf.s3.ap-east-1.amazonaws.com/forensic/disk-investigation/id_ed25519
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: ssh challenge@disk-investigation.ctf.empasoft.tech
+
+hints:
+  - cost: 10
+    content: |
+      What is Secure Boot? Why does it work in the Cloud?????
+      By the way, no privilege escalation here.
+
+flags:
+  - type: static
+    content: ECTF{d1sk_f0r3ns1c____:)___0LqgzoqIUHTSDXrpDDLcqR3JTzXtvHz1Mz3PgFRqqc_}
+tags:
+  - forensic
+  - crypto
+  - cloud
+  - hardware
+version: "0.1"

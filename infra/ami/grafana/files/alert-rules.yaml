@@ -1,0 +1,337 @@
+apiVersion: 1
+groups:
+    - orgId: 1
+      name: Last 5 minutes
+      folder: SLA alerts
+      interval: 5m
+      rules:
+        - uid: cf0zar463n474b
+          title: CPU utilization over 70%
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: builder
+                expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 70
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          isPaused: false
+          notification_settings:
+            receiver: CTF Discord
+        - uid: ff0zavg2b0c1sa
+          title: RAM utilization over 70%
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: code
+                expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 70
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 5m
+          isPaused: false
+          notification_settings:
+            receiver: CTF Discord
+    - orgId: 1
+      name: Last minute
+      folder: SLA alerts
+      interval: 1m
+      rules:
+        - uid: af0y9idhr2tc0a
+          title: CTFd status
+          condition: C
+          data:
+            - refId: A
+              queryType: range
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: P8E80F9AEF21F6940
+              model:
+                datasource:
+                    type: loki
+                    uid: P8E80F9AEF21F6940
+                editorMode: code
+                expr: count_over_time({container_name="ctfd"} |= `ERROR [CTFd] Exception on` [1m]) or vector(0)
+                instant: true
+                intervalMs: 1000
+                maxDataPoints: 43200
+                queryType: range
+                refId: A
+            - refId: reducer
+              queryType: expression
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params: []
+                      reducer:
+                        params: []
+                        type: avg
+                      type: query
+                datasource:
+                    name: Expression
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                reducer: last
+                refId: reducer
+                type: reduce
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 1
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: reducer
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          isPaused: false
+          notification_settings:
+            receiver: CTF Discord
+        - uid: cf0zb53e18n40a
+          title: Disk free space less than 30%
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: code
+                expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|vfat|efivarfs", mountpoint!="/rootfs/boot"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|vfat|efivarfs", mountpoint!="/rootfs/boot"}) * 100
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 30
+                        type: lt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          isPaused: false
+          notification_settings:
+            receiver: CTF Discord
+        - uid: bf0zbbwcm9pmoe
+          title: Node down
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: code
+                expr: up
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: eq
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          isPaused: false
+          notification_settings:
+            receiver: CTF Discord
+        - uid: cf0zbk97b0b9ce
+          title: Container down
+          condition: C
+          data:
+            - refId: A
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: PBFA97CFB590B2093
+              model:
+                editorMode: code
+                expr: time() - container_last_seen{container!="POD"}
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: A
+            - refId: C
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 60
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - C
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: A
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: C
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          isPaused: false
+          notification_settings:
+            receiver: CTF Discord

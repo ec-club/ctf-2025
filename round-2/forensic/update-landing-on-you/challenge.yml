@@ -1,0 +1,34 @@
+name: Update landing on you
+author: "[Lab of Information Systems Security Assurance, Soonchunhyang University](https://www.schlisa.com)"
+category: forensic
+
+description: |
+  You were minding your own business, casually eavesdropping on some airwaves like any responsible hacker. Suddenly, BAM! An OTA update crash-landed right into your packet sniffer like it had a crush on you. 💘
+
+  Now you’re stuck with a dump of encrypted blobs, weird firmware files, and some suspiciously named payloads. The device it came from? Unclear. The manufacturer? Possibly allergic to documentation. The update? Definitely not FDA approved.
+
+  Your mission is to make sense of this chaotic transmission, recover what was updated, and figure out what secrets it’s hiding. Bonus points if you don’t fall in love with the firmware along the way.
+
+attribution: Authored by [Lab of Information Systems Security Assurance, Soonchunhyang University](https://www.schlisa.com)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+attempts: 5
+
+files:
+  - files/lisa_fota_capture.pcap
+  - files/SPECS.md
+
+flags:
+  - type: static
+    content: ECTF{L1S4_F0T4_AVN_M4ST3R_2025}
+tags:
+  - forensic
+  - crypto
+  - automotive
+version: "0.1"

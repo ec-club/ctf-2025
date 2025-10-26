@@ -1,0 +1,40 @@
+name: Blind goat
+author: "[flame](https://github.com/zolbooo)"
+category: misc
+
+description: |
+  This autumn is the autumn of SSH awareness! Please use what you have learned about SSH
+  this year to solve this challenge.
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: ssh -p 2222 blind-goat.ctf.empasoft.tech
+
+hints:
+  - cost: 100
+    content: |
+      ```python
+      t = paramiko.Transport(("challenge", 2222))
+      t.start_client(timeout=5)
+      t.auth_none("wow")
+      chan = t.open_session()
+      backconnect_port = magic() # flipendo
+      chan.close()
+      chan = t.open_forwarded_tcpip_channel(("localhost", 8888), ("localhost", backconnect_port))
+      # go get it!
+      ```
+flags:
+  - type: regex
+    content: ECTF{v3ry_bl1nd_[A-Za-z\d\-_]{43}_v3ry_d3mur3_[A-Za-z\d\-_]{32}}
+tags:
+  - misc
+  - networking
+  - linux
+version: "0.1"

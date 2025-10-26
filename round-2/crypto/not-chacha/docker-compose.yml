@@ -1,0 +1,25 @@
+services:
+  not-chacha:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/not-chacha:latest
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.not-chacha.rule=Host(`not-chacha.ctf.empasoft.tech`)
+      - traefik.http.services.not-chacha.loadbalancer.server.port=8000
+    environment:
+      - FLAG=ECTF{$1_c@r3ful_$2_M@cS_4r3_d1ff3r3n!_$3}
+networks:
+  default:
+    name: traefik-internal
+    external: true

@@ -1,0 +1,28 @@
+name: Never debug or Always debug
+author: "[ByamB4](https://github.com/ByamB4)"
+category: reverse
+
+description: |
+  Intentionally evil, by Oleg’s request. Scanners won’t save you. 48 hours of pure fun (or pain).
+
+attribution: Authored by [ByamB4](https://github.com/ByamB4)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+files:
+  - files/challenge
+
+connection_info: https://never-debug.ctf.empasoft.tech
+
+flags:
+  - type: regex
+    content: ECTF{n1c3_d3bugg1ng_sk1llz_[A-Za-z\d\-_]{8,}_g00000_[A-Za-z\d\-_]{8,}}
+tags:
+  - reverse
+  - web
+version: "0.1"

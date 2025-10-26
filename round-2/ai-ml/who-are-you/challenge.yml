@@ -1,0 +1,34 @@
+name: Who are you?
+author: "[Core Logic and Technology LLC](https://coretech.asia)"
+category: AI/ML
+
+description: |
+  We heard that you are interested in LLMs. So are we!
+  Your task is to build a simple application that can identify LLMs based on their writing style.
+
+  You can use any AI/ML model or technique you like, but the application must be able to accurately identify LLMs in a variety of contexts.
+  Get at least 70% of all test cases correct to get the flag!
+
+  Archive password: `gP4dQhmy7KqFZz3+5fAUkgykxeAsqUssec7bhZCq7IpZeffqAC8LWENhSyFAMYF6`
+
+attribution: Authored by [Core Logic and Technology LLC](https://coretech.asia)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: https://who-are-you.ctf.empasoft.tech
+
+files:
+  - files/who-are-you.zip
+
+flags:
+  - type: regex
+    content: ECTF{LLMs_[A-Za-z\d\-_]{8}_@a3_[A-Za-z\d\-_]{16}_fun_[A-Za-z\d\-_]{8}_1nn1t\?}
+tags:
+  - AI
+  - ML
+version: "0.1"

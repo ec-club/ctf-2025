@@ -1,0 +1,24 @@
+services:
+  peephole:
+    build:
+      context: challenge
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    ports:
+      - 8443:8443
+      - 8443:8443/udp
+    volumes:
+      - ./challenge/certstore.json:/app/certstore.json:ro
+    environment:
+      FLAG: test
+      CERT_STORE_PATH: /app/certstore.json
+    restart: unless-stopped

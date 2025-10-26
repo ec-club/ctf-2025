@@ -1,0 +1,92 @@
+---
+- name: Set up challenge machine
+  hosts: default
+  vars:
+    ecr_users:
+      - name: root
+        home: /root
+      - name: ci
+        home: /home/ci
+      - name: ubuntu
+        home: /home/ubuntu
+  tasks:
+    # Server setup
+    - name: Set timezone
+      become: true
+      timezone:
+        name: Asia/Ulaanbaatar
+    - name: Prepare SSH users
+      include_tasks: ../tasks/prepare-users.yml
+    - name: Install Docker and Docker Compose
+      include_tasks: ../tasks/install-docker.yml
+    - name: Create ci user
+      become: true
+      user:
+        name: ci
+        shell: /sbin/nologin
+        state: present
+    - name: Allow ci user to run docker without sudo
+      become: true
+      user:
+        name: ci
+        groups: docker
+        append: yes
+    - name: Add SSH key for ci user
+      become: true
+      authorized_key:
+        user: ci
+        exclusive: false
+        key: "{{ lookup('file', './files/ci.pub') }}"
+        state: present
+    - name: Install AWS CLI
+      include_tasks: ../tasks/install-aws-cli.yml
+    - name: Install ECR credential helper
+      become: true
+      package:
+        name: amazon-ecr-credential-helper
+        state: present
+    - name: Create docker config directories for users
+      become: true
+      file:
+        path: "{{ item.home }}/.docker"
+        state: directory
+        mode: "0700"
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+        recurse: true
+      loop: "{{ ecr_users }}"
+    - name: Configure ECR credential helper for users
+      become: true
+      copy:
+        dest: "{{ item.home }}/.docker/config.json"
+        content: |
+          {
+              "credsStore": "ecr-login"
+          }
+        mode: "0600"
+        owner: "{{ item.name }}"
+        group: "{{ item.name }}"
+      loop: "{{ ecr_users }}"
+    # Traefik setup
+    - name: Create directory for Traefik
+      become: true
+      file:
+        path: /opt/traefik
+        state: directory
+        mode: "0755"
+    - name: Copy application files
+      become: true
+      copy:
+        src: "./files/{{ item }}"
+        dest: "/opt/traefik/{{ item }}"
+        mode: "0644"
+      loop: [docker-compose.yml, config.alloy]
+    - name: Create Letsencrypt directory for Traefik
+      become: true
+      file:
+        path: /opt/traefik/letsencrypt
+        state: directory
+        mode: "0755"
+    - name: Pull necessary Docker images
+      become: true
+      shell: "cd /opt/traefik && docker compose pull"

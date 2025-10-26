@@ -1,0 +1,39 @@
+- name: Collect ssh public keys
+  run_once: true
+  delegate_to: localhost
+  find:
+    paths: ../ssh-keys
+    patterns: "*.pub"
+    file_type: file
+  register: ssh_keys
+- name: Set fact with user names
+  run_once: true
+  set_fact:
+    users: "{{ ssh_keys.files | map(attribute='path') | map('basename') | map('regex_replace', '\\.pub$', '') | list }}"
+# Server setup
+- name: Create users
+  become: true
+  user:
+    name: "{{ item }}"
+    shell: /bin/bash
+    create_home: yes
+    state: present
+  loop: "{{ users }}"
+- name: Add users to sudoers
+  become: true
+  community.general.sudoers:
+    name: "{{ item }}"
+    user: "{{ item }}"
+    nopassword: true
+    runas: ALL
+    commands: ALL
+    state: present
+  loop: "{{ users }}"
+- name: Add SSH key for users
+  become: true
+  authorized_key:
+    user: "{{ item }}"
+    exclusive: true
+    key: "{{ lookup('file', '../ssh-keys/' + item + '.pub') }}"
+    state: present
+  loop: "{{ users }}"

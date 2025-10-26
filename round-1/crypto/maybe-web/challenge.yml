@@ -1,0 +1,27 @@
+name: Maybe web
+author: "[flame](https://github.com/zolbooo)"
+category: crypto
+
+description: |
+  What is this? Is this a web challenge? Or is it a crypto challenge?
+  Maybe both? Maybe neither? However, no source code is given. Try to
+  call routes and find out what is this service about.
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: https://maybe-web.ctf.empasoft.tech
+
+flags:
+  - type: regex
+    content: ECTF{xtr3m3_c1ph3rt3xt-[A-Za-z\d\-_]{8}_n0t_s0_s3cur3_[A-Za-z\d\-_]{8}}
+tags:
+  - crypto
+  - web
+version: "0.1"

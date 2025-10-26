@@ -1,0 +1,135 @@
+name: Build challenge images
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  detect-changes:
+    name: Detect changes in round-2
+    runs-on: ubuntu-latest
+    outputs:
+      # See: https://github.com/dorny/paths-filter?tab=readme-ov-file#outputs
+      changed_files: ${{ steps.changes.outputs.r2_files }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          list-files: shell
+          filters: |
+            r2:
+              - 'round-2/**'
+  prepare-challenge-list:
+    name: Prepare list of changed challenges
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    outputs:
+      docker_builds_needed: ${{ steps.build_docker_images_matrix.outputs.matrix }}
+    steps:
+      - name: Extract changed challenge names
+        id: extract
+        run: |
+          FILES="${{ needs.detect-changes.outputs.changed_files }}"
+          if [ -z "$FILES" ]; then
+            echo "No changes detected in round-2."
+            echo 'CHALLENGES={}' >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          JSON="{}"
+          for FILE in $FILES; do
+            # Extract the challenge directory name (e.g., round-2/challenge-name/...)
+            CHALLENGE_CATEGORY=$(echo "$FILE" | cut -d'/' -f2)
+            CHALLENGE_NAME=$(echo "$FILE" | cut -d'/' -f3)
+            FILE_PATH=$(echo "$FILE" | cut -d'/' -f4-)
+            if $(echo $JSON | jq "has(\"$CHALLENGE_CATEGORY/$CHALLENGE_NAME\")"); then
+              # Append to existing array
+              JSON=$(echo $JSON | jq ".\"$CHALLENGE_CATEGORY/$CHALLENGE_NAME\" += [\"$FILE_PATH\"]")
+            else
+              # Create new array
+              JSON=$(echo $JSON | jq ". + {\"$CHALLENGE_CATEGORY/$CHALLENGE_NAME\": [\"$FILE_PATH\"]}")
+            fi
+          done
+          echo "Extracted challenges and files: $JSON"
+          COMPACT_JSON=$(echo "$JSON" | jq -c .)
+          echo "changes=$COMPACT_JSON" >> $GITHUB_OUTPUT
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build list of challenges needing Docker builds
+        id: build_docker_images_matrix
+        run: |
+          CHANGES='${{ steps.extract.outputs.changes }}'
+          if [ "$(echo "$CHANGES")" == "{}" ]; then
+            echo "No challenges to build."
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          DOCKER_BUILDS_NEEDED={}
+          for CHALLENGE in $(echo "$CHANGES" | jq -r 'keys[]'); do
+            FILES=$(echo "$CHANGES" | jq -r --arg CHALLENGE "$CHALLENGE" '.[$CHALLENGE][]')
+
+            for FILE in $FILES; do
+              target_dockerfile="round-2/$CHALLENGE/$(echo $FILE | cut -d'/' -f1)/Dockerfile"
+              if [ -f "$target_dockerfile" ]; then
+                if $(echo $DOCKER_BUILDS_NEEDED | jq "has(\"$CHALLENGE\")"); then
+                  if $(echo $DOCKER_BUILDS_NEEDED | jq ".\"$CHALLENGE\" | index(\"$(echo $FILE | cut -d'/' -f1)\") != null"); then
+                    continue
+                  fi
+                  DOCKER_BUILDS_NEEDED=$(echo $DOCKER_BUILDS_NEEDED | jq ".\"$CHALLENGE\" += [\"$(echo $FILE | cut -d'/' -f1)\"]")
+                else
+                  DOCKER_BUILDS_NEEDED=$(echo $DOCKER_BUILDS_NEEDED | jq ". + {\"$CHALLENGE\": [\"$(echo $FILE | cut -d'/' -f1)\"]}")
+                fi
+              fi
+            done
+          done
+
+          if [ "$(echo $DOCKER_BUILDS_NEEDED | jq 'length')" -eq 0 ]; then
+            echo "No Docker builds needed."
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          echo "Challenges needing Docker builds: $DOCKER_BUILDS_NEEDED"
+          BUILDS=$(echo "$DOCKER_BUILDS_NEEDED" | jq -c 'to_entries | map(. as $c | .value | map({challenge: $c.key, image: .})) | flatten')
+          MATRIX="{\"include\": $BUILDS}"
+          echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
+  build-challenges:
+    name: Build challenge Docker images
+    needs: prepare-challenge-list
+    if: ${{ needs.prepare-challenge-list.outputs.docker_builds_needed != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.prepare-challenge-list.outputs.docker_builds_needed) }}
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          role-to-assume: ${{ vars.AWS_ECR_PUSH_ROLE }}
+          aws-region: ap-east-1
+      - name: Sign in to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: latest
+        run: |
+          REPO_NAME="challenges/$(echo '${{ matrix.challenge }}' | cut -d'/' -f2)"
+          if [ "$(find "round-2/${{ matrix.challenge }}/" -maxdepth 2 -type f -name Dockerfile | wc -l)" -gt 1 ]; then
+            ECR_REPOSITORY="$REPO_NAME/${{ matrix.image }}"
+          else
+            ECR_REPOSITORY="$REPO_NAME"
+          fi
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          echo "Building and pushing image: $IMAGE_URI"
+          docker build -t $IMAGE_URI "round-2/${{ matrix.challenge }}/${{ matrix.image }}"
+          docker push $IMAGE_URI

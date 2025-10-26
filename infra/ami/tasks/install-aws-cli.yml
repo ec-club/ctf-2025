@@ -1,0 +1,24 @@
+- name: Update apt cache
+  become: true
+  apt:
+    update_cache: true
+- name: Install necessary dependencies
+  become: true
+  apt:
+    name: [unzip, jq]
+    state: present
+- name: Download AWS CLI
+  unarchive:
+    src: "https://awscli.amazonaws.com/awscli-exe-linux-{{ ansible_facts.architecture }}.zip"
+    remote_src: true
+    dest: /tmp/
+- name: Install AWS CLI
+  become: true
+  command: /tmp/aws/install --update
+- name: Ensure execute permissions for AWS CLI
+  become: true
+  file:
+    path: /usr/local/aws-cli
+    state: directory
+    mode: "0755"
+    recurse: true

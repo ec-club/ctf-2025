@@ -1,0 +1,18 @@
+services:
+  meme-or-meme:
+    build:
+      context: challenge
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      FLAG: ECTF{1h8LsoLpN5iySJJVntTyI10LQDxMmli5NQsGh9jQvU_h3@p_0r_m3m3??_zY1NQRJFyAab8CQMTcfAiHn0NvK5jQtkvvQgyzwULiU}
+    restart: unless-stopped

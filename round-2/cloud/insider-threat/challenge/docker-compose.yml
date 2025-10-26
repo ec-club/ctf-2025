@@ -1,0 +1,31 @@
+services:
+  insider-threat:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/insider-threat:latest
+    networks: [external]
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-external
+      - traefik.http.routers.insider-threat.rule=Host(`insider-threat.${CTF_DOMAIN_NAME}`)
+      - traefik.http.services.insider-threat.loadbalancer.server.port=8000
+      - ${MIDDLEWARES}
+      - ${AUTH_MIDDLEWARE_DATA}
+    environment:
+      - FLAG=ECTF{h0ly_$1_l@t3r@l_m0v3m3nt_$2_m@st3r?_$3}
+      - ALLOWED_NETWORK=${ALLOWED_NETWORK}
+      - KMS_KEY_ID=${KMS_KEY_ID}
+      - AWS_DEFAULT_REGION=${AWS_REGION}
+networks:
+  external:
+    name: traefik-external
+    external: true

@@ -1,0 +1,51 @@
+services:
+  reverse-task:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/real-reverse-task:latest
+    networks: [internal]
+    restart: always
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      - FLAG=ECTF{n1c3_$1_IPv6??????_$2}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.reverse-task.rule=Host(`real-reverse-task.ctf.empasoft.tech`)
+      - traefik.http.services.reverse-task.loadbalancer.server.port=8080
+  reverse-task-reloaded:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/real-reverse-task-reloaded:latest
+    restart: always
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    ports:
+      - "2222:8080"
+    environment:
+      - FLAG=ECTF{w00000w_$1_n1c3_$2_IPv6??????_f0r_r3@1?_$3}
+networks:
+  internal:
+    name: traefik-internal
+    external: true
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.27.0.0/16
+        - subnet: 2001:dead:beef:3::/64

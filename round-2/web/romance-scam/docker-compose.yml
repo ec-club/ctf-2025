@@ -1,0 +1,57 @@
+services:
+  backend:
+    image: 396961015104.dkr.ecr.ap-southeast-1.amazonaws.com/challenges/romance-scam/backend:latest
+    networks: [external]
+    restart: always
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      - FLAG=ECTF{$1_B@d_R0m4nc3_$2_5c4m_$3}
+      - AWS_REGION=${AWS_REGION}
+      - TG_BOT_TOKEN_SECRET_ID=${TG_BOT_TOKEN_SECRET_ID}
+      - AI_MODEL_NAME=${AI_MODEL_NAME}
+      - AI_ENDPOINT_URL=${AI_ENDPOINT_URL}
+      - DEEPSEEK_API_TOKEN_SECRET_ID=${DEEPSEEK_API_TOKEN_SECRET_ID}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-external
+      - traefik.http.routers.romance-scam-backend.rule=Host(`romance-scam.${CTF_DOMAIN_NAME}`) && PathPrefix(`/login`)
+      - traefik.http.services.romance-scam-backend.loadbalancer.server.port=8000
+  frontend:
+    image: 396961015104.dkr.ecr.ap-southeast-1.amazonaws.com/challenges/romance-scam/web:latest
+    networks: [internal]
+    restart: always
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.romance-scam-frontend.rule=Host(`romance-scam.${CTF_DOMAIN_NAME}`)
+      - traefik.http.services.romance-scam-frontend.loadbalancer.server.port=3000
+      - ${MIDDLEWARES}
+      - ${AUTH_MIDDLEWARE_DATA}
+networks:
+  external:
+    name: traefik-external
+    external: true
+  internal:
+    name: traefik-internal
+    external: true

@@ -1,0 +1,124 @@
+prometheus.exporter.cadvisor "monitoring_docker" {
+  docker_only = true
+}
+discovery.relabel "cadvisor" {
+    targets = prometheus.exporter.cadvisor.monitoring_docker.targets
+    rule {
+        target_label = "job"
+        replacement  = "integrations/docker"
+    }
+    rule {
+        target_label = "instance"
+        replacement  = constants.hostname
+    }
+}
+prometheus.scrape "scraper" {
+  targets    = discovery.relabel.cadvisor.output
+  forward_to = [prometheus.remote_write.internal.receiver]
+  scrape_interval = "15s"
+}
+
+prometheus.remote_write "internal" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+}
+
+discovery.docker "linux" {
+  host = "unix:///var/run/docker.sock"
+}
+discovery.relabel "logs_integrations_docker" {
+	targets = []
+	rule {
+			source_labels = ["__meta_docker_container_name"]
+			regex = "/(.*)"
+			target_label = "container_name"
+	}
+	rule {
+		target_label = "instance"
+		replacement  = constants.hostname
+	}
+}
+loki.source.docker "loki" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.linux.targets
+  relabel_rules = discovery.relabel.logs_integrations_docker.rules
+  forward_to = [loki.write.internal.receiver]
+}
+loki.write "internal" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+discovery.relabel "integrations_node_exporter" {
+  targets = prometheus.exporter.unix.integrations_node_exporter.targets
+  rule {
+    target_label = "instance"
+    replacement  = constants.hostname
+  }
+  rule {
+    target_label = "job"
+    replacement = "integrations/node_exporter"
+  }
+}
+prometheus.exporter.unix "integrations_node_exporter" {
+  disable_collectors = ["ipvs", "btrfs", "infiniband", "xfs", "zfs"]
+  enable_collectors = ["meminfo"]
+  filesystem {
+    fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|tmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+    mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+    mount_timeout        = "5s"
+  }
+  netclass {
+    // Ignore virtual and container network interfaces
+    ignored_devices = "^(veth.*|cali.*|[a-f0-9]{15})$"
+  }
+  netdev {
+    // Exclude virtual and container network interfaces from device metrics
+    device_exclude = "^(veth.*|cali.*|[a-f0-9]{15})$"
+  }
+}
+prometheus.scrape "integrations_node_exporter" {
+	scrape_interval = "15s"
+  targets    = discovery.relabel.integrations_node_exporter.output
+  forward_to = [prometheus.remote_write.internal.receiver]
+}
+
+loki.source.journal "logs_integrations_integrations_node_exporter_journal_scrape" {
+  // Only collect logs from the last 24 hours
+  max_age       = "24h0m0s"
+  relabel_rules = discovery.relabel.logs_integrations_integrations_node_exporter_journal_scrape.rules
+  forward_to    = [loki.write.internal.receiver]
+}
+local.file_match "logs_integrations_integrations_node_exporter_direct_scrape" {
+  path_targets = [{
+    __address__ = "localhost",
+    __path__    = "/rootfs/var/log/{syslog,messages,*.log}",
+    instance    = constants.hostname,
+    job         = "integrations/node_exporter",
+  }]
+}
+discovery.relabel "logs_integrations_integrations_node_exporter_journal_scrape" {
+  targets = []
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    source_labels = ["__journal__boot_id"]
+    target_label  = "boot_id"
+  }
+  rule {
+    source_labels = ["__journal__transport"]
+    target_label  = "transport"
+  }
+  rule {
+    source_labels = ["__journal_priority_keyword"]
+    target_label  = "level"
+  }
+}
+loki.source.file "logs_integrations_integrations_node_exporter_direct_scrape" {
+  targets    = local.file_match.logs_integrations_integrations_node_exporter_direct_scrape.targets
+  forward_to = [loki.write.internal.receiver]
+}

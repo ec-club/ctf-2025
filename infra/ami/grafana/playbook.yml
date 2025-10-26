@@ -1,0 +1,30 @@
+---
+- name: Set up Grafana server
+  hosts: default
+  tasks:
+    # Server setup
+    - name: Set timezone
+      become: true
+      timezone:
+        name: Asia/Ulaanbaatar
+    - name: Prepare SSH users
+      include_tasks: ../tasks/prepare-users.yml
+    - name: Install Docker and Docker Compose
+      include_tasks: ../tasks/install-docker.yml
+    # App setup
+    - name: Create directory for app
+      become: true
+      file:
+        path: /opt/app
+        state: directory
+        mode: "0755"
+    - name: Copy application files
+      become: true
+      copy:
+        src: "./files/{{ item }}"
+        dest: "/opt/app/{{ item }}"
+        mode: "0644"
+      loop: [docker-compose.yml, config.alloy]
+    - name: Pull necessary Docker images
+      become: true
+      shell: "cd /opt/app && docker compose pull"

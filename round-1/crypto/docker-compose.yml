@@ -1,0 +1,45 @@
+services:
+  maybe-web:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/maybe-web:latest
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.maybe-web.rule=Host(`maybe-web.ctf.empasoft.tech`)
+      - traefik.http.services.maybe-web.loadbalancer.server.port=8000
+    environment:
+      - FLAG=ECTF{xtr3m3_c1ph3rt3xt-$1_n0t_s0_s3cur3_$2}
+  not-web:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/not-web:latest
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.not-web.rule=Host(`not-web.ctf.empasoft.tech`)
+      - traefik.http.services.not-web.loadbalancer.server.port=8000
+    environment:
+      - FLAG=ECTF{s0rry_$1_extr3m3_c1ph3rt3xt-$2_n0t_s0_s3cur3_$3}
+networks:
+  default:
+    name: traefik-internal
+    external: true

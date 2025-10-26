@@ -1,0 +1,26 @@
+name: Secure hello
+author: "[flame](https://github.com/zolbooo)"
+category: Welcome
+
+description: |
+  Welcome to the Empasoft CTF 2025! Find out where to discover the flag in Discord: https://discord.gg/FrPJYXVd
+
+  Flag format: `ECTF{<full digest, uppercase>}`
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+flags:
+  - type: static
+    content: ECTF{34255D7FFE3F933CF1776C65885A2E13F3D5451BFBD85793CD2ABD65D67E0A1D}
+tags:
+  - forensic
+  - networking
+  - crypto
+version: "0.1"

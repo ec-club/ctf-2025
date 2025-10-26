@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>?????????????????????????????????????????????????????????</title>
+  </head>
+  <body class="flex justify-center items-center w-full min-h-screen lg:p-24 p-12 text-white bg-cover bg-center bg-no-repeat" style="background-color: #111315; background-image: url('./inf.gif')">
+    <section class="max-w-7xl w-full">
+      <div class="flex justify-between">
+        <div class="flex items-center font-mono italic bg-red-600 text-2xl">
+          From ⒷⓨⓐⓜⒷ④ 🅑🅨🅐🅜🅑❹ ＢｙａｍＢ４ 𝐁𝐲𝐚𝐦𝐁𝟒 𝕭𝖞𝖆𝖒𝕭𝟒 𝑩𝒚𝒂𝒎𝑩𝟒 𝓑𝔂𝓪𝓶𝓑𝟒 𝐵𝓎𝒶𝓂𝐵4 𝔹𝕪𝕒𝕞𝔹𝟜 𝙱𝚢𝚊𝚖𝙱𝟺 𝖡𝗒𝖺𝗆𝖡𝟦 𝗕𝘆𝗮𝗺𝗕𝟰 𝘽𝙮𝙖𝙢𝘽𝟰 𝘉𝘺𝘢𝘮𝘉𝟦 🄱🅈🄰🄼🄱4 🅱🆈🅰🅼🅱4 🇧​🇾​🇦​🇲​🇧​4 𝔅𝔶𝔞𝔪𝔅4 ᵦᵧₐₘᵦ₄ ᴮʸᵃᵐᴮ⁴ ⒝⒴⒜⒨⒝⑷ 𐐒ʎɐɯ𐐒𝗁 𐐒γɒm𐐒ᖸ B́ýáḿB́4
+          B̤y̤a̤m̤B̤4 B̈ÿäm̈B̈4 B̤̈ÿ̤ä̤m̤̈B̤̈4 ̸B̸y̸a̸m̸B4 ጌሃልጠጌϤ 乃ﾘﾑﾶ乃ʮ ByamB⒋
+        </div>
+      </div>
+      <div class="flex flex-col gap-4 items-center justify-center h-full">
+        <div class="flex items-center gap-4">
+          <form id="inputForm">
+            <div class="w-full mt-10 text-center">
+              <input
+                type="text"
+                class="w-full bg-[#302E2E] rounded-lg px-2 py-2 border-[#393C3E] focus:border-0"
+                id="userInput"
+                placeholder="????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????"
+              />
+            </div>
+            <div id="container" style="position: relative; width: 1000px; height: 500px">
+              <button id="heckButton" class="bg-[#272C30] hover:bg-[#272C30]/90 px-6 py-2 rounded-md" style="position: absolute">Catch me if you can</button>
+            </div>
+          </form>
+        </div>
+        <div className="min-h-48 bg-black p-4 rounded-md text-sm" dangerouslySetInnerHTML="{{" __html: displayText }}></div>
+        <div class="flex py-2 px-4 rounded-lg font-mono text-sm text-red">
+          <p id="response" class="text-3xl bg-red-600"></p>
+          &nbsp;
+        </div>
+      </div>
+    </section>
+
+    <script>
+      var Module = {
+        onRuntimeInitialized: function () {
+          var checkInput = Module.cwrap("check_input", "string", ["string"]);
+
+          const form = document.getElementById("inputForm");
+          const input = document.getElementById("userInput");
+          const responseEl = document.getElementById("response");
+
+          input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              return false;
+            }
+          });
+
+          form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var val = input.value.trim();
+            var response = checkInput(val);
+            responseEl.textContent = response;
+          });
+        },
+      };
+      const _0xb5b287 = _0x4494;
+      (function (_0x35892f, _0x1b5cc4) {
+        const _0x39a142 = _0x4494,
+          _0xa169c9 = _0x35892f();
+        while (!![]) {
+          try {
+            const _0x2aa102 =
+              parseInt(_0x39a142(0x1ba)) / 0x1 +
+              (parseInt(_0x39a142(0x1d4)) / 0x2) * (-parseInt(_0x39a142(0x1bd)) / 0x3) +
+              (-parseInt(_0x39a142(0x1c4)) / 0x4) * (parseInt(_0x39a142(0x1d2)) / 0x5) +
+              (-parseInt(_0x39a142(0x1bf)) / 0x6) * (-parseInt(_0x39a142(0x1cc)) / 0x7) +
+              (parseInt(_0x39a142(0x1d0)) / 0x8) * (-parseInt(_0x39a142(0x1d1)) / 0x9) +
+              (parseInt(_0x39a142(0x1be)) / 0xa) * (-parseInt(_0x39a142(0x1c8)) / 0xb) +
+              parseInt(_0x39a142(0x1ce)) / 0xc;
+            if (_0x2aa102 === _0x1b5cc4) break;
+            else _0xa169c9["push"](_0xa169c9["shift"]());
+          } catch (_0x1ad20f) {
+            _0xa169c9["push"](_0xa169c9["shift"]());
+          }
+        }
+      })(_0x1bd4, 0x76eee);
+      function _0x4494(_0x4f9cd1, _0x5da35d) {
+        const _0x1bd458 = _0x1bd4();
+        return (
+          (_0x4494 = function (_0x449483, _0x306a50) {
+            _0x449483 = _0x449483 - 0x1b8;
+            let _0x564e2c = _0x1bd458[_0x449483];
+            return _0x564e2c;
+          }),
+          _0x4494(_0x4f9cd1, _0x5da35d)
+        );
+      }
+      const btn = document[_0xb5b287(0x1c7)](_0xb5b287(0x1d3)),
+        container = document[_0xb5b287(0x1c7)](_0xb5b287(0x1cd));
+      (btn["style"]["left"] = Math[_0xb5b287(0x1cf)]() * (container[_0xb5b287(0x1bb)] - btn[_0xb5b287(0x1bc)]) + "px"),
+        (btn[_0xb5b287(0x1b9)][_0xb5b287(0x1cb)] = Math["random"]() * (container["clientHeight"] - btn["offsetHeight"]) + "px"),
+        container[_0xb5b287(0x1c1)]("mousemove", (_0x539119) => {
+          const _0x1c5769 = _0xb5b287,
+            _0xefaeb7 = btn[_0x1c5769(0x1c2)](),
+            _0x44c32f = container["getBoundingClientRect"](),
+            _0x4f68a4 = 0x96,
+            _0x1689b6 = _0xefaeb7[_0x1c5769(0x1b8)] + _0xefaeb7["width"] / 0x2,
+            _0x8482d8 = _0xefaeb7[_0x1c5769(0x1cb)] + _0xefaeb7["height"] / 0x2,
+            _0x22a5fc = _0x1689b6 - _0x539119["clientX"],
+            _0xbf70f4 = _0x8482d8 - _0x539119[_0x1c5769(0x1c5)],
+            _0x50f39f = Math[_0x1c5769(0x1c3)](_0x22a5fc, _0xbf70f4);
+          if (_0x50f39f < _0x4f68a4) {
+            const _0xa2581f = container[_0x1c5769(0x1bb)] - btn[_0x1c5769(0x1bc)],
+              _0x5d7e28 = container[_0x1c5769(0x1c9)] - btn[_0x1c5769(0x1ca)];
+            (btn["style"]["left"] = Math[_0x1c5769(0x1cf)]() * _0xa2581f + "px"), (btn[_0x1c5769(0x1b9)][_0x1c5769(0x1cb)] = Math[_0x1c5769(0x1cf)]() * _0x5d7e28 + "px");
+          }
+        }),
+        btn["addEventListener"](_0xb5b287(0x1c6), () => btn[_0xb5b287(0x1c0)]());
+      function _0x1bd4() {
+        const _0x8bbb51 = [
+          "getElementById",
+          "55KlCOOq",
+          "clientHeight",
+          "offsetHeight",
+          "top",
+          "7tdTksk",
+          "container",
+          "20633484cEOBps",
+          "random",
+          "25624oyjDEC",
+          "1062TBFOhP",
+          "515RyEYAm",
+          "heckButton",
+          "402448OxodSa",
+          "left",
+          "style",
+          "255218LXxRtw",
+          "clientWidth",
+          "offsetWidth",
+          "6rFIpTa",
+          "81430emxBer",
+          "1418322HmcHBX",
+          "blur",
+          "addEventListener",
+          "getBoundingClientRect",
+          "hypot",
+          "35060xcqfWt",
+          "clientY",
+          "focus",
+        ];
+        _0x1bd4 = function () {
+          return _0x8bbb51;
+        };
+        return _0x1bd4();
+      }
+    </script>
+    <script src="index.js"></script>
+  </body>
+</html>

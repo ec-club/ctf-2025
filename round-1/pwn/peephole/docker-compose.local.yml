@@ -1,0 +1,18 @@
+services:
+  peephole:
+    build:
+      context: challenge
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      FLAG: ECTF{w00w_n0_sysc@lls???_%s_spl1c3_%s}
+    restart: unless-stopped

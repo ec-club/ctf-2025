@@ -1,0 +1,82 @@
+services:
+  watchtower:
+    image: taufiq14s/watchtower-ecr@sha256:3fad0aba3b548ebcfe03d0091103039c0d10f6c375e75d6e065852d10efb2a20
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      com.centurylinklabs.watchtower.enable: false
+    command:
+      - --interval=300
+      - --cleanup
+  traefik:
+    image: traefik:v3
+    container_name: challenges-traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks: [external, internal]
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+      - 1337:1337
+      - 127.0.0.1:8080:8080
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --metrics.prometheus=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.tcp.address=:1337
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http3=true
+      - --entrypoints.websecure.asdefault=true
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --certificatesresolvers.le.acme.caServer=${LETSENCRYPT_CA_SERVER:-https://acme-staging-v02.api.letsencrypt.org/directory}
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --certificatesresolvers.le.acme.email=zolboobayar.g+ctf@empasoft.ider.edu.mn
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.websecure.http.tls.certresolver=le
+    volumes:
+      - ${TLS_CERTS_PATH:-./letsencrypt}:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  alloy:
+    image: grafana/alloy:${GRAFANA_ALLOY_VERSION:-v1.11.2}
+    restart: unless-stopped
+    container_name: challenges-alloy
+    privileged: true
+    hostname: alloy.${HOSTNAME:-challenges}.${INTERNAL_DOMAIN:-local}
+    networks: [external]
+    environment:
+      ALLOY_DEPLOY_MODE: docker
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    command: run --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    labels:
+      com.centurylinklabs.watchtower.enable: false
+networks:
+  external:
+    name: traefik-external
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+        - subnet: 2001:dead:beef:1::/64
+  internal:
+    name: traefik-internal
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.26.0.0/16
+        - subnet: 2001:dead:beef:2::/64

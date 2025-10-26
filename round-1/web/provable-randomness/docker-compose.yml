@@ -1,0 +1,31 @@
+services:
+  provable-randomness:
+    scale: 2
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/provable-randomness:latest
+    restart: always
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    tmpfs:
+      - /app/tmp:size=256M,mode=1777
+    environment:
+      - FLAG=ECTF{v3ry_s3cur3_$1_r@nd0mn3ss_$2}
+      - DB_PATH=/app/tmp/db.sqlite3
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.provable-randomness.rule=Host(`provable-randomness.ctf.empasoft.tech`)
+      - traefik.http.services.provable-randomness.loadbalancer.server.port=3000
+
+networks:
+  default:
+    name: traefik-internal
+    external: true

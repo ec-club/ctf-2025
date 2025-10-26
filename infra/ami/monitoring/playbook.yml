@@ -1,0 +1,46 @@
+---
+- name: Set up Prometheus server
+  hosts: default
+  vars:
+    prometheus_version: "3.5.0"
+  tasks:
+    # Server setup
+    - name: Set timezone
+      become: true
+      timezone:
+        name: Asia/Ulaanbaatar
+    - name: Prepare SSH users
+      include_tasks: ../tasks/prepare-users.yml
+    - name: Install Docker and Docker Compose
+      include_tasks: ../tasks/install-docker.yml
+    # App setup
+    - name: Create directory for app
+      become: true
+      file:
+        path: /opt/app
+        state: directory
+        mode: "0755"
+    - name: Create directories for volumes
+      become: true
+      file:
+        path: "/opt/app/{{ item.name }}"
+        state: directory
+        owner: "{{ item.owner | default('root') }}"
+        mode: "0755"
+      loop:
+        - name: loki
+          owner: "10001"
+        - name: prometheus
+          owner: nobody
+        - name: alloy
+          owner: "473"
+    - name: Copy application files
+      become: true
+      copy:
+        src: "./files/{{ item }}"
+        dest: "/opt/app/{{ item }}"
+        mode: "0644"
+      loop: [docker-compose.yml, config.alloy, loki-config.yml]
+    - name: Pull necessary Docker images
+      become: true
+      shell: "cd /opt/app && docker compose pull"

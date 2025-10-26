@@ -1,0 +1,58 @@
+services:
+  peephole:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/peephole:latest
+    networks: [external]
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      FLAG: ECTF{w00w_n0_sysc@lls???_%s_spl1c3_%s}
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-external
+      - traefik.tcp.routers.peephole.rule=HostSNI(`peephole.ctf.empasoft.tech`)
+      - traefik.tcp.routers.peephole.entrypoints=tcp
+      - traefik.tcp.routers.peephole.tls=true
+      - traefik.tcp.routers.peephole.tls.certresolver=le
+      - traefik.tcp.services.peephole.loadbalancer.server.port=1337
+  meme-or-meme:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/meme-or-meme:latest
+    networks: [internal]
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      FLAG: ECTF{1h8LsoLpN5iySJJVntTyI10LQDxMmli5NQsGh9jQvU_h3@p_0r_m3m3??_zY1NQRJFyAab8CQMTcfAiHn0NvK5jQtkvvQgyzwULiU}
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.tcp.routers.meme-or-meme.rule=HostSNI(`meme-or-meme.ctf.empasoft.tech`)
+      - traefik.tcp.routers.meme-or-meme.entrypoints=tcp
+      - traefik.tcp.routers.meme-or-meme.tls=true
+      - traefik.tcp.routers.meme-or-meme.tls.certresolver=le
+      - traefik.tcp.services.meme-or-meme.loadbalancer.server.port=1337
+networks:
+  external:
+    name: traefik-external
+    external: true
+  internal:
+    name: traefik-internal
+    external: true

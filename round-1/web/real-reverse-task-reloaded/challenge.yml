@@ -1,0 +1,31 @@
+name: Real reverse task - Reloaded
+author: "[flame](https://github.com/zolbooo)"
+category: web
+
+description: |
+  Okay, now it's different for real! Embrace the power of networking muahahaha!
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+files:
+  - challenge/src/main.rs
+
+connection_info: http://real-reverse-task-reloaded.ctf.empasoft.tech:2222
+
+hints:
+  - content: Did you solve previous challenge? Flag is dualstack and has some hints…
+    cost: 0
+flags:
+  - type: regex
+    content: ECTF{w00000w_[A-Za-z\d\-_]{8}_n1c3_[A-Za-z\d\-_]{16}_IPv6\?{6}_f0r_r3@1\?_[A-Za-z\d\-_]{8}}
+tags:
+  - web
+  - networking
+version: "0.1"

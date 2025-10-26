@@ -1,0 +1,31 @@
+name: Insider threat
+author: "[flame](https://github.com/zolbooo)"
+category: cloud
+
+description: |
+  Imagine being a developer and being able to create tokens for any user. So cringe…
+  That's why I decided to hide a key so hard, that even an insider can't find it.
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: https://insider-threat.ctf.empasoft.tech
+
+files:
+  - challenge/app/auth.py
+
+flags:
+  - type: regex
+    content: ECTF{h0ly_[A-Za-z\d\-_]{8}_l@t3r@l_m0v3m3nt_[A-Za-z\d\-_]{8}_m@st3r\?_[A-Za-z\d\-_]{8}}
+tags:
+  - cloud
+  - web
+  - crypto
+  - networking
+version: "0.1"

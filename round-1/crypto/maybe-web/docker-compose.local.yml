@@ -1,0 +1,19 @@
+services:
+  maybe-web:
+    build:
+      context: challenge
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    environment:
+      - FLAG=ECTF{xtr3m3_c1ph3rt3xt-$1_n0t_s0_s3cur3_$2}

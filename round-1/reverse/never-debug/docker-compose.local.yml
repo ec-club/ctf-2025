@@ -1,0 +1,64 @@
+services:
+  db:
+    build:
+      context: db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: challenge
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d challenge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  web:
+    build:
+      context: challenge
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      DATABASE_URL: "postgres://postgres:postgrespassword@db:5432/challenge?sslmode=disable"
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+  watchdog:
+    build:
+      context: watchdog
+    depends_on:
+      db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+          pids: 1
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      FLAG: ECTF{n1c3_d3bugg1ng_sk1llz_(1)_g00000_(2)}
+      DB_HOST: db
+      DB_NAME: challenge
+      DB_USER: postgres
+      DB_PASSWORD: postgrespassword
+    restart: unless-stopped
+networks:
+  default:
+    internal: true

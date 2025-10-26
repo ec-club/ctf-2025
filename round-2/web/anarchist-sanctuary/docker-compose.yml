@@ -1,0 +1,85 @@
+services:
+  web:
+    image: 396961015104.dkr.ecr.ap-southeast-1.amazonaws.com/challenges/anarchist-sanctuary/web:latest
+    networks: [internal]
+    restart: always
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    tmpfs:
+      - /app/tmp:size=256M,mode=1777
+    environment:
+      - DATABASE_URL=/app/tmp/local.db
+      - APP_SECRET=${APP_SECRET}
+      - FLAG=ECTF{$1_r3@1_@narcH1st_$2_p@rt3_f0r_l1f3}
+      # See: https://svelte.dev/docs/kit/adapter-node#Environment-variables
+      - PROTOCOL_HEADER=x-forwarded-proto
+      - HOST_HEADER=x-forwarded-host
+      - XFF_DEPTH=1 # Only Traefik is in front of the app
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.anarchist-sanctuary.rule=Host(`anarchist-sanctuary.${CTF_DOMAIN_NAME}`)
+      - traefik.http.services.anarchist-sanctuary.loadbalancer.server.port=3000
+      - ${MIDDLEWARES}
+      - ${AUTH_MIDDLEWARE_DATA}
+  bot:
+    image: 396961015104.dkr.ecr.ap-southeast-1.amazonaws.com/challenges/anarchist-sanctuary/bot:latest
+    networks: [default, internal]
+    restart: always
+    cap_add:
+      - SYS_ADMIN # For Chrome sandboxing
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      - APP_SECRET=${APP_SECRET}
+      - APP_ORIGIN=http://web:3000
+  chatbot:
+    image: 396961015104.dkr.ecr.ap-southeast-1.amazonaws.com/challenges/anarchist-sanctuary/chatbot:latest
+    networks: [default, internal]
+    restart: always
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    environment:
+      - AWS_REGION=${AWS_REGION}
+      - TG_BOT_TOKEN_SECRET_ID=${TG_BOT_TOKEN_SECRET_ID}
+      - DEEPSEEK_API_TOKEN_SECRET_ID=${DEEPSEEK_API_TOKEN_SECRET_ID}
+      - AI_MODEL_NAME=${AI_MODEL_NAME}
+      - AI_ENDPOINT_URL=${AI_ENDPOINT_URL}
+      - BOT_ADDRESS=bot:3000
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.27.0.0/16
+        - subnet: 2001:dead:beef:3::/64
+  external:
+    name: traefik-external
+    external: true
+  internal:
+    name: traefik-internal
+    external: true

@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  # CTF 관리 서버
+  ctf-manager:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/vin-for-win/manager:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./firmware:/opt/ctf/firmware
+    privileged: true
+    restart: unless-stopped
+    networks:
+      - internal
+      - ecu_shared_network # 이 라인 추가
+    depends_on:
+      - gateway-shared
+    environment:
+      - DOCKER_IMAGE_INFOTAINMENT=396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/vin-for-win/infotainment:latest
+      - DOCKER_IMAGE_GATEWAY=396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/vin-for-win/gateway:latest
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-internal
+      - traefik.http.routers.vin-for-win.rule=Host(`vin-for-win.${CTF_DOMAIN_NAME}`)
+      - traefik.http.services.vin-for-win.loadbalancer.server.port=8080
+      - ${MIDDLEWARES}
+      - ${AUTH_MIDDLEWARE_DATA}
+  # 공유 Gateway ECU (항상 실행 - VIN 서비스 포함)
+  gateway-shared:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/vin-for-win/gateway:latest
+    container_name: gateway_shared
+    networks:
+      - ecu_shared_network
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+    volumes:
+      - /lib/modules:/lib/modules:ro
+
+networks:
+  internal:
+    name: traefik-internal
+    external: true
+  ecu_shared_network:
+    driver: bridge
+    name: ecu_shared_network

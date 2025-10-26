@@ -1,0 +1,37 @@
+name: Alphabet soup
+author: "[flame](https://github.com/zolbooo)"
+category: misc
+
+description: |
+  Do you know phonetic alphabet? It's time to put your knowledge to the test!
+  Enjoy two hours of radio transmissions captured from unknown source.
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+attempts: 5
+
+connection_info: https://challenge-assets-production-empasoft-ctf.s3.ap-east-1.amazonaws.com/misc/alphabet-soup/challenge.mp3
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+hints:
+  - cost: 0
+    content: |
+      Sometimes too much AI hurts you… Can you stick to the classic methods? Turn it into picture or some fingerprint or something 🥀
+  - cost: 0
+    content: Have you heard of Base36?
+  - cost: 0
+    content: github.com/martinlindhe/base36
+
+flags:
+  - type: static
+    content: ECTF{w0wv3ry_NofNgz_@ud10_l1f3_ORz8SZaeMBpB_p@rs1ng_@1nt_3@sy_X36JpuOJL0i9C1jiJc_n1c3_0n3}
+tags:
+  - misc
+  - AI/ML
+version: "0.1"

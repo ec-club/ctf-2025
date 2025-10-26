@@ -1,0 +1,61 @@
+name: Imaginary challenge
+author: "[flame](https://github.com/zolbooo)"
+category: forensic
+
+description: |
+  I have never imagined that I can misconfigure Cloud and turn it into a forensic challenge.
+  But here we are. Github Actions can be secure, but sometimes not secure enough?
+  Try fiddling with the Github Actions workflow to download a Docker image from where?
+
+  OIDC is pretty cool, but it can be misconfigured too, so be careful!
+
+  IAM role: https://challenge-assets-production-empasoft-ctf.s3.ap-east-1.amazonaws.com/forensic/imaginary-challenge/iam-role
+
+  ```terraform
+  resource "aws_iam_role" "imaginary-challenge" {
+    name = "imaginary-challenge"
+    assume_role_policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Effect = "Allow"
+          Principal = {
+            Federated = var.github_openid_connect_provider_arn
+          }
+          Action = "sts:AssumeRoleWithWebIdentity"
+          Condition = {
+            StringEquals = {
+              "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com",
+            }
+            StringLike = {
+              "token.actions.githubusercontent.com:sub" : "repo:*-empasoft-ctf/2025-*" # oops
+            }
+          }
+        }
+      ]
+    })
+  }
+  ```
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+files:
+  - files/challenge.py
+  - challenge/wordlist.txt
+
+flags:
+  - type: regex
+    content: ECTF{1m@g1n@ry_[A-Za-z\d\-_]{8,}_fl1g_G1THUB_[A-Za-z\d\-_]{16,}_@ct10n5_r0ck}
+tags:
+  - forensic
+  - crypto
+  - cloud
+  - CI/CD
+version: "0.1"

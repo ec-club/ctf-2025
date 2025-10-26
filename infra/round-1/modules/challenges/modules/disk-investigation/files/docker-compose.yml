@@ -1,0 +1,31 @@
+services:
+  alloy:
+    image: grafana/alloy:${GRAFANA_ALLOY_VERSION:-v1.10.2}
+    restart: unless-stopped
+    container_name: challenges-alloy
+    privileged: true
+    hostname: alloy.${HOSTNAME:-challenges}.${INTERNAL_DOMAIN:-local}
+    ports:
+      - 12345:12345
+      - 4317:4317
+      - 4318:4318
+    environment:
+      ALLOY_DEPLOY_MODE: docker
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /dev/disk/:/dev/disk:ro
+      - /var/log:/srv-log:ro
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    labels:
+      com.centurylinklabs.watchtower.enable: false
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+        - subnet: 2001:dead:beef:1::/64

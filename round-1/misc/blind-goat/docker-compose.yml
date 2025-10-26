@@ -1,0 +1,19 @@
+services:
+  blind-goat:
+    image: 396961015104.dkr.ecr.ap-east-1.amazonaws.com/challenges/blind-goat:latest
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    restart: unless-stopped
+    ports:
+      - 2222:2222
+    environment:
+      - FLAG=ECTF{v3ry_bl1nd_$1_v3ry_d3mur3_$2}

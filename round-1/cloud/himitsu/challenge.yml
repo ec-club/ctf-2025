@@ -1,0 +1,30 @@
+name: 秘密
+author: "[flame](https://github.com/zolbooo)"
+category: cloud
+
+description: |
+  日本語が大好きなんです！でも、それだけでは課題の本質は伝わらないですね。
+
+  でも、インフラもフラグも同じですよね。クラウドではAPIキーはどこに保存するんですか？
+
+  SSH秘密鍵: https://challenge-assets-production-empasoft-ctf.s3.ap-east-1.amazonaws.com/cloud/himitsu/id_ed25519
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: ssh -i id_ed25519 challenge@himitsu.ctf.empasoft.tech
+
+flags:
+  - type: static
+    content: ECTF{v3ry-s3cr3t-qP9AxVErTJvPKA7PrAYvst1lBfW7fHzv5iIkxemyOlk-st00r@g3-G7dkh2Dt5gCfEziu4vGn3Kf5uKGCazgaUnCysOiac4}
+tags:
+  - cloud
+  - linux
+  - networking
+version: "0.1"

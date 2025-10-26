@@ -1,0 +1,1 @@
+ALTER TABLE `solutions` ADD `submission` text NOT NULL;

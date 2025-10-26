@@ -1,0 +1,30 @@
+name: My little bucket
+author: "[flame](https://github.com/zolbooo)"
+category: cloud
+
+description: |
+  Novelty of this CTF season! A cloud challenge! Find my little
+  bucket and get the flag! The flag is stored in an object in
+  a private S3 bucket.
+
+  SSH private key: https://challenge-assets-production-empasoft-ctf.s3.ap-east-1.amazonaws.com/cloud/my-little-bucket/id_ed25519
+
+attribution: Authored by [flame](https://github.com/zolbooo)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: ssh -i id_ed25519 challenge@my-little-bucket.ctf.empasoft.tech
+
+flags:
+  - type: static
+    content: ECTF{my-jtb9TiTxpLHxoOdZ5WiENZBmJRLgJ60N1gWkdzhhek-little-bucket-TqngGt5aH6SKibFPYpWkMxYLf1R6Z2f8RKtvbyegYg}
+tags:
+  - cloud
+  - linux
+  - networking
+version: "0.1"

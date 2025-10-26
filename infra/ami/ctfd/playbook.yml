@@ -1,0 +1,46 @@
+---
+- name: Set up CTFd machine
+  hosts: default
+  tasks:
+    # Server setup
+    - name: Set timezone
+      become: true
+      timezone:
+        name: Asia/Ulaanbaatar
+    - name: Prepare SSH users
+      include_tasks: ../tasks/prepare-users.yml
+    - name: Install AWS CLI
+      include_tasks: ../tasks/install-aws-cli.yml
+    - name: Install Docker and Docker Compose
+      include_tasks: ../tasks/install-docker.yml
+    # CTFd setup
+    - name: Create directory for app
+      become: true
+      file:
+        path: /opt/ctfd
+        state: directory
+        mode: "0755"
+    - name: Copy application files
+      become: true
+      copy:
+        src: "./files/{{ item }}"
+        dest: "/opt/ctfd/{{ item }}"
+        mode: "0644"
+      loop: [docker-compose.yml, config.alloy]
+    - name: Create directories for CTFd
+      become: true
+      file:
+        path: "/opt/ctfd/.data/{{ item }}"
+        state: directory
+        recurse: true
+        mode: "0755"
+      loop: [uploads, logs]
+    - name: Create Letsencrypt directory for Traefik
+      become: true
+      file:
+        path: /opt/ctfd/letsencrypt
+        state: directory
+        mode: "0755"
+    - name: Pull necessary Docker images
+      become: true
+      shell: "cd /opt/ctfd && docker compose pull"

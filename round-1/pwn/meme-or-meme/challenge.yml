@@ -1,0 +1,27 @@
+name: meme or meme
+author: "heaper-reaper"
+category: pwn
+
+description: |
+  Someone said that heaps are like some cat memes.
+
+attribution: Authored by [heaper reaper](https://youtu.be/6PLatPMoxGw)
+type: dynamic
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+connection_info: ncat --ssl meme-or-meme.ctf.empasoft.tech 1337
+files:
+  - files/challenge
+  - files/libc.so.6
+
+flags:
+  - type: static
+    content: ECTF{1h8LsoLpN5iySJJVntTyI10LQDxMmli5NQsGh9jQvU_h3@p_0r_m3m3??_zY1NQRJFyAab8CQMTcfAiHn0NvK5jQtkvvQgyzwULiU}
+tags:
+  - pwn
+version: "0.1"

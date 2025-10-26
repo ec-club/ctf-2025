@@ -1,0 +1,80 @@
+services:
+  ctfd:
+    image: ghcr.io/ctfd/ctfd:3.8.0
+    container_name: ctfd
+    user: root
+    restart: always
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - UPLOAD_PROVIDER=s3
+      - AWS_ACCESS_KEY_ID=${AWS_S3_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_S3_SECRET_ACCESS_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_S3_REGION=${AWS_REGION}
+      - DATABASE_URL=mysql+pymysql://${DB_USERNAME}:${DB_PASSWORD}@${DB_ENDPOINT}/ctfd
+      - REDIS_URL=redis://${REDIS_ENDPOINT}
+      - WORKERS=4
+      - LOG_FOLDER=/var/log/CTFd
+      - ACCESS_LOG=-
+      - ERROR_LOG=-
+    volumes:
+      - .data/uploads:/var/uploads
+      - .data/logs:/var/log/CTFd
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ctfd.rule=Host(`${DOMAIN}`)
+  traefik:
+    image: traefik:v3
+    container_name: ctfd-traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - ${CTFD_ADDRESS:-0.0.0.0:80}:80
+      - ${CTFD_ADDRESS6:-[::1]:80}:80
+      - 443:443
+      - 443:443/udp
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --metrics.prometheus=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.http3=true
+      - --entrypoints.websecure.asdefault=true
+      - --entrypoints.web.http.redirections.entryPoint.to=websecure
+      - --entrypoints.web.http.redirections.entryPoint.scheme=https
+      - --certificatesresolvers.le.acme.caServer=${LETSENCRYPT_CA_SERVER:-https://acme-staging-v02.api.letsencrypt.org/directory}
+      - --certificatesresolvers.le.acme.tlschallenge=true
+      - --certificatesresolvers.le.acme.email=zolboobayar.g+ctf@empasoft.ider.edu.mn
+      - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.websecure.http.tls.certresolver=le
+    volumes:
+      - ${TLS_CERTS_PATH:-./letsencrypt}:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  alloy:
+    image: grafana/alloy:${GRAFANA_ALLOY_VERSION:-v1.11.2}
+    container_name: ctfd-alloy
+    privileged: true
+    hostname: alloy.ctfd.${INTERNAL_DOMAIN:-local}
+    environment:
+      ALLOY_DEPLOY_MODE: docker
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    command: run --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+        - subnet: 2001:dead:beef:1::/64

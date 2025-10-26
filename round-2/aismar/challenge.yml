@@ -1,0 +1,27 @@
+name: aismar
+author: "[ByamB4](https://github.com/ByamB4)"
+category: reverse
+
+description: |
+
+
+attribution: Authored by [ByamB4](https://github.com/ByamB4)
+type: dynamic
+
+attempts: 5
+
+connection_info: https://aismar.s3.ap-east-1.amazonaws.com/index.html
+
+extra:
+  initial: 1000
+  decay: 10
+  minimum: 100
+image: null
+
+flags:
+  - type: static
+    content: ECTF{h4v3_y0u_3nj0y3d_7his_0r_h473_7his_?}
+tags:
+  - reverse
+  - web
+version: "0.1"
